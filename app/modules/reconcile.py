@@ -10,4 +10,5 @@ def balance(intake, cases):
                 ignored=intake['blank'] + intake['repeated'], accounted=accounted,
                 balanced=accounted == intake['input'] and observed == intake['accepted'],
                 ready=ready, pending=len(cases)-ready, issues=dict(sorted(status.items())),
-                releasable=bool(cases) and ready==len(cases) and not intake['rejected'] and accounted==intake['input'] and observed==intake['accepted'])
+                releasable=bool(cases) and ready==len(cases) and not intake['rejected']
+                and accounted==intake['input'] and observed==intake['accepted'])

@@ -42,6 +42,13 @@
   </form>
 </aside>
 {% endmacro %}
+{% macro expedite() %}
+<section class="panel expedite" id="expedite-panel" aria-labelledby="expedite-title" hidden>
+  <div class="panel-head"><h2 id="expedite-title">首日加急选择</h2><span id="expedite-summary"></span></div>
+  <p id="expedite-pick" class="expedite-pick" aria-live="polite"></p>
+  <div class="scroll" id="expedite-body"></div>
+</section>
+{% endmacro %}
 {% macro status() %}
 <footer class="statusbar"><span id="notice" role="status" aria-live="polite">正在读取样例</span><a href="/examples/clean">下载样例 CSV</a></footer>
 {% endmacro %}

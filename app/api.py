@@ -2,7 +2,7 @@ from flask import Blueprint, Response, current_app, jsonify, request
 
 from app.business import DomainIssue
 from app.evidence.render import artifact
-from app.inputs import read_input
+from app.inputs import read_critical, read_input
 from app.modules.pipeline import run
 from app.review.service import execute, review
 
@@ -14,7 +14,7 @@ STAGES = {'intake':1,'prepare':2,'calculate':3,'policy':4,'balance':5}
 def preview(stage):
     if stage not in STAGES:
         raise DomainIssue('STAGE_UNKNOWN')
-    return jsonify(run(read_input(),STAGES[stage]))
+    return jsonify(run(read_input(),STAGES[stage],read_critical()))
 
 
 @api.route('/runs',methods=['GET','POST'])
@@ -22,7 +22,7 @@ def runs():
     store = current_app.extensions['runs']
     if request.method == 'GET':
         return jsonify(items=store.list())
-    return jsonify(execute(store,read_input()))
+    return jsonify(execute(store,read_input(),read_critical()))
 
 
 @api.route('/runs/<run_id>', methods=['GET','PATCH'])

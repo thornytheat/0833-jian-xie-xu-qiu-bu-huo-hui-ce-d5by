@@ -6,6 +6,8 @@ def artifact(run):
         'schema': 'review-evidence/1',
         'manifest': run['report']['manifest'],
         'balance': run['report']['balance'],
+        'expedite': run['report']['expedite'],
+        'signoff': run['report']['signoff'],
         'cases': run['report']['cases'],
         'intake': run['report']['intake'],
         'review': {key:run[key] for key in ('status','revision','note','reviewed')},

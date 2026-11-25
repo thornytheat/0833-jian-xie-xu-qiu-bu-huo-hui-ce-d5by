@@ -33,12 +33,14 @@ const valueLabels = {RPD:'相对偏差', ABSOLUTE:'绝对差', BOTH_ND:'双方�
   RECLAIM:'可回收', LIVE_SNAPSHOT:'活动快照', TRANSPORT:'运输中', DELIVERED:'已签收', CANCELLED:'已取消'};
 const headers = ['业务分组', '输入行', '计算值', '参考值', '判定'];
 
+const blockedLabels = {OVER_LIMIT:'仍超原缺货上限', UNMEASURED:'无法模拟',
+  ISOLATED_ROWS:'存在隔离行', ROWS_UNBALANCED:'行数未对平', NO_CASES:'没有可核对的分组'};
+
 export function badge(status) {
   return element('span', labels[status] || status, {class:'badge', 'data-result':status, title: status});
 }
 
-const fieldLabels = {matched:'匹配关系', unmet:'未覆盖', loads:'磅单明细', over_limit:'超限联单',
-  visible:'可见记录', removed:'删除记录', dangling:'悬空删除', grades:'传播级别', approved:'已批准降级',
+const fieldLabels = {matched:'匹配关系', unmet:'未覆盖', loads:'磅单明细', over_limit:'超限联单',  visible:'可见记录', removed:'删除记录', dangling:'悬空删除', grades:'传播级别', approved:'已批准降级',
   expired:'已过期审批', schedule:'排程', rejected:'未排入', curve:'剩余比例', horizon:'观察时点',
   suppressed:'遮蔽单元格', exposed:'可反推', compatible:'通过字段', violations:'差异字段',
   occupied:'占用号源', promoted:'候补转入', invalid_cancels:'无效取消', route:'到站路径',
@@ -117,3 +119,72 @@ export function history(items, active) {
   }
   if (!items.length) target.append(element('li','尚无执行批次'));
 }
+
+function reasonText(reason) {
+  const [kind, caseId] = String(reason).split(':');
+  return `${caseId || '全仓'} · ${blockedLabels[kind] || kind}`;
+}
+
+export function expedite(report) {
+  const panel = document.querySelector('#expedite-panel');
+  const summary = document.querySelector('#expedite-summary');
+  const body = document.querySelector('#expedite-body');
+  const selection = document.querySelector('#expedite-pick');
+  const plan = report.expedite;
+  panel.hidden = !plan;
+  if (!plan) return;
+  const signoff = report.signoff;
+  const ready = signoff ? signoff.ready : !plan.hold;
+  panel.dataset.conclusion = ready ? 'READY' : 'HELD';
+  summary.replaceChildren();
+  summary.append(element('strong', ready ? '可签发' : '整仓暂缓',
+    {class:'badge', 'data-result':ready ? 'READY' : 'HELD'}));
+  const reasons = signoff ? signoff.reasons : plan.blocked;
+  summary.append(element('span', ready
+    ? '加急后各备件均在原缺货上限内'
+    : `存在 ${reasons.length} 项阻止签发的差异`));
+  selection.replaceChildren();
+  if (plan.selected) {
+    const moved = plan.selected;
+    selection.append(element('span', `加急件：分组 ${moved.case}`, {class:'expedite-case'}));
+    selection.append(element('span', `第 ${moved.from_day} 天到货 ${moved.quantity} 件 → 第 ${moved.to_day} 天`,
+      {class:'expedite-move'}));
+    selection.append(element('span', moved.stocked_once ? '原到货已撤销，只入库一次' : '到货数量未对平',
+      {class:'expedite-reconcile', 'data-ok':String(moved.stocked_once)}));
+  } else {
+    selection.append(element('span','没有可减少缺货的加急选择',{class:'chart-note'}));
+  }
+
+  const head = element('tr');
+  head.append(...['关键件','业务分组','缺货上限','加急前缺货','加急后缺货','处理'].map(title =>
+    element('th', title, {scope:'col'})));
+  const table = element('table', undefined, {'aria-label':'加急前后缺货对比'});
+  table.append(element('thead'), element('tbody'));
+  table.tHead.append(head);
+  const rows = table.tBodies[0];
+  for (const [caseId, item] of Object.entries(plan.cases)) {
+    const tr = rows.insertRow();
+    const measured = item.baseline !== null && item.outcome !== null;
+    if (item.critical) tr.dataset.critical = 'true';
+    if (!measured) tr.dataset.unmeasured = 'true';
+    const toggle = element('button', item.critical ? '关键件' : '标记关键件',
+      {type:'button','data-critical':caseId,'aria-pressed':String(item.critical)});
+    tr.insertCell().append(toggle);
+    const limit = item.limit === null ? '—' : `${item.limit} 基点`;
+    const note = !measured ? '无法模拟'
+      : plan.selected && plan.selected.case === caseId ? `已加急 ${item.quantity} 件`
+        : item.within_limit ? '范围内' : '超出上限';
+    [caseId, limit, measured ? `${item.baseline.unserved} 件` : '—',
+      measured ? `${item.outcome.unserved} 件` : '—', note]
+      .forEach(value => tr.insertCell().textContent = value);
+  }
+
+  const blocked = element('ul', undefined, {class:'expedite-blocked'});
+  for (const reason of reasons) blocked.append(element('li', reasonText(reason)));
+  if (plan.missing_critical.length) {
+    blocked.append(element('li', `关键件标记无对应分组：${plan.missing_critical.join('、')}`));
+  }
+  body.replaceChildren(table);
+  if (blocked.children.length) body.append(blocked);
+}
+

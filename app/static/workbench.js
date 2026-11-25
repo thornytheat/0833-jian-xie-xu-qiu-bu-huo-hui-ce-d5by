@@ -1,5 +1,5 @@
 import {request} from './client.js';
-import {snapshot, history} from './view.js';
+import {snapshot, history, expedite} from './view.js';
 import {visualize} from './plots.js';
 
 const form = document.querySelector('#source');
@@ -11,11 +11,13 @@ const evidence = document.querySelector('#evidence');
 const stages = [...document.querySelectorAll('[data-stage]')];
 let stage = 'balance';
 let report, selected, batch, running = false;
+const critical = new Set();
 
 function source() {
   const data = new FormData();
   if (file.files.length) data.append('file',file.files[0]);
   else data.append('sample',profile.value);
+  for (const caseId of critical) data.append('critical',caseId);
   return data;
 }
 
@@ -28,12 +30,13 @@ function draw() {
   if (!report) return;
   snapshot(report, selected, stage);
   visualize(report, selected);
+  expedite(report);
   for (const button of stages) button.setAttribute('aria-pressed',String(button.dataset.stage===stage));
   document.querySelector('#panel-title').textContent = stages.find(button => button.dataset.stage===stage)?.textContent || '运行对账';
   detail.hidden = !batch;
   if (batch) {
     document.querySelector('#run-status').textContent = `${batch.id.slice(0,10)} · ${batch.status} · r${batch.revision}`;
-    detail.querySelector('[value="APPROVED"]').disabled = !report.balance.releasable || batch.status==='APPROVED';
+    detail.querySelector('[value="APPROVED"]').disabled = !report.signoff?.ready || batch.status==='APPROVED';
     detail.querySelector('[value="HELD"]').disabled = batch.status==='APPROVED';
     evidence.href = `/api/runs/${batch.id}/evidence`;
   }
@@ -82,17 +85,28 @@ form.addEventListener('submit', event => {
   });
 });
 const filename = document.querySelector('#file-name');
-profile.addEventListener('change',()=>{file.value=''; filename.textContent=''; preview(stage);});
-file.addEventListener('change',()=>{filename.textContent=file.files[0]?.name || ''; preview(stage);});
+profile.addEventListener('change',()=>{file.value=''; filename.textContent=''; critical.clear(); preview(stage);});
+file.addEventListener('change',()=>{filename.textContent=file.files[0]?.name || ''; critical.clear(); preview(stage);});
 document.querySelector('#rows').addEventListener('click',event=>{
   const button = event.target.closest('[data-case]');
   if (button) { selected = button.dataset.case; draw(); document.querySelector(`[data-case="${CSS.escape(selected)}"]`).focus(); }
+});
+document.querySelector('#expedite-body').addEventListener('click',event=>{
+  const button = event.target.closest('[data-critical]');
+  if (!button) return;
+  const caseId = button.dataset.critical;
+  if (critical.has(caseId)) critical.delete(caseId); else critical.add(caseId);
+  if (batch) { batch = null; report = null; }
+  preview(stage);
 });
 document.querySelector('#history').addEventListener('click',event=>{
   const button = event.target.closest('[data-run]');
   if (button) perform(async()=>{
     const result = await request(`/api/runs/${button.dataset.run}`);
-    stage='balance'; show(result,true); announce('已载入历史批次'); await refresh();
+    stage='balance'; show(result,true);
+    critical.clear();
+    for (const item of result.report.expedite?.critical || []) critical.add(item);
+    announce('已载入历史批次'); await refresh();
   });
 });
 detail.addEventListener('submit',event=>{

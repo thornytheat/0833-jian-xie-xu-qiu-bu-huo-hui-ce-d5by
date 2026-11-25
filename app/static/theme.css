@@ -18,7 +18,7 @@ body.inventory {margin:0;background:var(--bg);color:var(--ink);font:13px/1.5 var
 .inventory .mast {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;background:var(--surface);padding:calc(.72 * var(--pad)) calc(1.5 * var(--pad));min-height:var(--bar);border-bottom:1px solid var(--line)}
 .inventory .mast h1 {font-size:clamp(22px,3vw,32px);line-height:1.12;margin:0}
 .inventory .role {color:var(--muted);margin:0;font-weight:600}
-.inventory .main-inventory {flex:1;display:grid;grid-template-areas:"s s" "k k" "c r" "i r" "a a";grid-template-columns:minmax(0,1.18fr) minmax(0,1fr);gap:var(--gap);align-content:start;padding:var(--pad)}
+.inventory .main-inventory {flex:1;display:grid;grid-template-areas:"s s" "k k" "c r" "i r" "e e" "a a";grid-template-columns:minmax(0,1.18fr) minmax(0,1fr);gap:var(--gap);align-content:start;padding:var(--pad)}
 .inventory .source {grid-area:s;display:flex;align-items:center;flex-wrap:wrap;gap:var(--gap);padding:var(--pad);background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);min-width:0}
 .inventory .source input {position:absolute;width:1px;height:1px;opacity:0}
 .inventory .source:has(input:focus-visible) .file {outline:2px solid var(--accent);outline-offset:3px}
@@ -36,6 +36,7 @@ body.inventory {margin:0;background:var(--bg);color:var(--ink);font:13px/1.5 var
 .inventory .results {grid-area:r}
 .inventory .chart {grid-area:c}
 .inventory .inspection {grid-area:i}
+.inventory .expedite {grid-area:e}
 .inventory .archive {grid-area:a}
 .inventory h2 {font-size:16px;margin:0 0 .65em}
 .inventory .panel-head {display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;justify-content:space-between}
@@ -62,9 +63,20 @@ body.inventory {margin:0;background:var(--bg);color:var(--ink);font:13px/1.5 var
 .inventory .chart{border-radius:40px 12px 12px 12px}
 .inventory .metric{border-radius:40px 8px;text-align:center}
 .inventory .stages button{border-radius:40px 6px}
-@media(max-width:1110px) {.inventory .main-inventory {grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"s s" "k k" "c i" "r r" "a a"} }
-@media(max-width:700px) {.inventory .desk-inventory {display:block} .inventory .rail {position:static;height:auto;border:0;padding:9px var(--pad)} .inventory .brand,.inventory .rail-link {display:none} .inventory .stages {margin:0;display:flex;flex-wrap:wrap} .inventory .stages button {width:auto} .inventory .main-inventory {grid-template-columns:minmax(0,1fr);grid-template-areas:"s" "k" "c" "r" "i" "a"} .inventory .kpis {grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media(max-width:1110px) {.inventory .main-inventory {grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"s s" "k k" "c i" "r r" "e e" "a a"} }
+@media(max-width:700px) {.inventory .desk-inventory {display:block} .inventory .rail {position:static;height:auto;border:0;padding:9px var(--pad)} .inventory .brand,.inventory .rail-link {display:none} .inventory .stages {margin:0;display:flex;flex-wrap:wrap} .inventory .stages button {width:auto} .inventory .main-inventory {grid-template-columns:minmax(0,1fr);grid-template-areas:"s" "k" "c" "r" "i" "e" "a"} .inventory .kpis {grid-template-columns:repeat(2,minmax(0,1fr))} }
 @media print {.inventory .source,.inventory .rail,.inventory .archive,.inventory .statusbar {display:none} .inventory .desk-inventory,.inventory .main-inventory {display:block} .inventory .panel {margin-bottom:8px} }
+
+.inventory .expedite-pick {display:flex;flex-wrap:wrap;gap:10px;margin:0 0 10px;align-items:baseline}
+.inventory .expedite-case {font-weight:700;color:var(--accent)}
+.inventory .expedite-move {font-family:var(--font-num)}
+.inventory .expedite-reconcile[data-ok="true"] {color:var(--muted)}
+.inventory .expedite-reconcile[data-ok="false"] {color:var(--fault);font-weight:700}
+.inventory .expedite table {min-width:520px}
+.inventory .expedite tr[data-critical="true"] {background:var(--soft)}
+.inventory .expedite tr[data-critical="true"] td:nth-child(2) {font-weight:700;color:var(--accent)}
+.inventory .expedite-blocked {margin:10px 0 0;padding-left:1.15em;color:var(--fault)}
+.inventory .expedite[data-conclusion="READY"] .badge[data-result="READY"] {color:var(--accent)}
 
 .receipts{display:flex;gap:8px;flex-wrap:wrap}.receipt{padding:9px 12px;border-radius:0 18px;border:1px solid var(--accent);background:var(--soft)}.arrival{font:700 19px var(--font-num);color:var(--accent)}
 

@@ -2,6 +2,7 @@ from flask import request
 
 from app.business import DomainIssue
 from app.config import MAX_FILE, ROOT
+from app.modules.expedite import normalize
 
 SAMPLES = {'dirty': 'incoming.csv', 'clean': 'ready.csv'}
 
@@ -19,3 +20,11 @@ def read_input():
     if len(value)>MAX_FILE:
         raise DomainIssue('FILE_TOO_LARGE')
     return value
+
+
+def read_critical():
+    """从表单读取关键件标记，支持重复字段与逗号分隔。"""
+    marks = []
+    for value in request.form.getlist('critical'):
+        marks.extend(value.replace('，', ',').split(','))
+    return normalize(marks)

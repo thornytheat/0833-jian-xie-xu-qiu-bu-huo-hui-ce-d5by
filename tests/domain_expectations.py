@@ -1,0 +1,16 @@
+EXPECTED = {'0001': (2, 2500, 'READY'),
+ '0002': (1, 0, 'READY'),
+ '0003': (0, None, 'DUPLICATE_DAY'),
+ '0004': (1, 10000, 'SERVICE_TARGET_MISSED')}
+EVIDENCE = {'0001': {'forecast': '3/2',
+          'reorder': 3,
+          'unserved': 2,
+          'requested': 8,
+          'orders': {'3': 1, '4': 2, '5': 1},
+          'closing': 3},
+ '0002': {'forecast': '3/2',
+          'reorder': 2,
+          'unserved': 0,
+          'requested': 4,
+          'orders': {'2': 2},
+          'closing': 2}}

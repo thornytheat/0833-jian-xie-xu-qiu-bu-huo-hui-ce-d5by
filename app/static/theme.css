@@ -1,0 +1,71 @@
+:root {--bg:#edfaf4;--surface:#f9fffa;--ink:#19372e;--accent:#14684d;--radius:12px;
+--line:color-mix(in srgb,#19372e 22%,#f9fffa);--soft:color-mix(in srgb,#14684d 11%,#f9fffa);
+--muted:color-mix(in srgb,#19372e 77%,#f9fffa);--rail:color-mix(in srgb,#14684d 8%,#edfaf4);
+--fault:#9c251f;--pad:18px;--gap:15px;--row:38px;
+--font-ui:"Charter","PingFang SC",sans-serif;--font-num:ui-monospace,monospace;
+--bar:51px;--nav:188px;--stroke:1px;--lift:4px;
+color-scheme:light}
+body.inventory {margin:0;background:var(--bg);color:var(--ink);font:13px/1.5 var(--font-ui)}
+.inventory * {box-sizing:border-box}
+.inventory [hidden] {display:none!important}
+.inventory .desk-inventory {display:grid;grid-template-columns:var(--nav) minmax(0,1fr);min-height:100vh}
+.inventory .work-inventory {display:flex;flex-direction:column;min-width:0}
+.inventory .rail {background:var(--rail);position:sticky;top:0;align-self:start;height:100vh;padding:calc(1.45 * var(--pad)) var(--pad);border-right:1px solid var(--line)}
+.inventory .brand {display:grid;place-content:center;width:62px;height:48px;border-radius:var(--radius);border:var(--stroke) solid var(--accent);font:700 26px/1 var(--font-ui);text-decoration:none}
+.inventory .stages {display:grid;gap:5px;margin:28px 0 16px}
+.inventory .stages button,.rail-link {text-align:left;display:block;width:100%;overflow-wrap:anywhere}
+.inventory .rail-link {padding:.6em .75em;color:var(--muted)}
+.inventory .mast {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;background:var(--surface);padding:calc(.72 * var(--pad)) calc(1.5 * var(--pad));min-height:var(--bar);border-bottom:1px solid var(--line)}
+.inventory .mast h1 {font-size:clamp(22px,3vw,32px);line-height:1.12;margin:0}
+.inventory .role {color:var(--muted);margin:0;font-weight:600}
+.inventory .main-inventory {flex:1;display:grid;grid-template-areas:"s s" "k k" "c r" "i r" "a a";grid-template-columns:minmax(0,1.18fr) minmax(0,1fr);gap:var(--gap);align-content:start;padding:var(--pad)}
+.inventory .source {grid-area:s;display:flex;align-items:center;flex-wrap:wrap;gap:var(--gap);padding:var(--pad);background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);min-width:0}
+.inventory .source input {position:absolute;width:1px;height:1px;opacity:0}
+.inventory .source:has(input:focus-visible) .file {outline:2px solid var(--accent);outline-offset:3px}
+.inventory .file {cursor:pointer;color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.inventory #file-name {overflow-wrap:anywhere;max-width:100%}
+.inventory button,select,textarea {font:inherit;color:inherit;border:1px solid var(--line);padding:.42em .68em;background:var(--soft);border-radius:var(--radius);cursor:pointer}
+.inventory button:is(:hover,[aria-pressed="true"]),.action {background:var(--accent);color:var(--surface);border-color:var(--accent)}
+.inventory button:disabled {opacity:.56;cursor:default}
+.inventory :focus-visible {outline:2px solid var(--accent);outline-offset:3px}
+.inventory a {color:var(--accent);text-underline-offset:.2em}
+.inventory .kpis {grid-area:k;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--gap);min-width:0}
+.inventory .metric {background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:var(--pad);display:grid;align-content:center;overflow-wrap:anywhere}
+.inventory .metric strong {font:600 clamp(21px,3.2vw,32px)/1.1 var(--font-num);font-variant-numeric:tabular-nums}
+.inventory .panel {background:var(--surface);padding:var(--pad);min-width:0;border:1px solid var(--line);border-radius:var(--radius)}
+.inventory .results {grid-area:r}
+.inventory .chart {grid-area:c}
+.inventory .inspection {grid-area:i}
+.inventory .archive {grid-area:a}
+.inventory h2 {font-size:16px;margin:0 0 .65em}
+.inventory .panel-head {display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;justify-content:space-between}
+.inventory #counts,#run-status {color:var(--muted);overflow-wrap:anywhere}
+.inventory .scroll {overflow:auto;max-height:297px}
+.inventory table {border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;min-width:350px}
+.inventory th,td {text-align:left;height:var(--row);padding:4px 7px;border-bottom:1px solid var(--line);white-space:nowrap}
+.inventory th {position:sticky;top:0;background:var(--surface);color:var(--muted)}
+.inventory td:nth-child(n+2):nth-child(-n+4) {text-align:right;font-family:var(--font-num)}
+.inventory .badge {color:var(--fault);font-size:.87em;padding:2px 4px;white-space:nowrap}
+.inventory .badge:is([data-result="READY"],[data-result="APPROVED"]) {color:var(--accent)}
+.inventory #detail {margin:0;max-height:260px;overflow:auto;overflow-wrap:anywhere;font: .94em/1.55 var(--font-ui)}
+.inventory #detail dl {margin:0 0 0 .55em;padding-left:.65em;border-left:1px solid var(--line)}
+.inventory #detail dt {font-weight:600;color:var(--muted)}
+.inventory #detail dd {margin:0 0 .43em .4em}
+.inventory #history {list-style:none;padding:0;display:flex;flex-wrap:wrap;gap:var(--gap);margin:0}
+.inventory #history li {display:flex;align-items:center;flex-wrap:wrap}
+.inventory #review {margin-top:14px;max-width:580px}
+.inventory textarea {display:block;width:100%;min-height:54px;cursor:text}
+.inventory .review-actions {display:flex;gap:6px;margin:8px 0}
+.inventory .statusbar {display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;border-top:1px solid var(--line);padding:10px var(--pad);color:var(--muted)}
+.inventory [data-failure="true"] {color:var(--fault)}
+.inventory .mast{box-shadow:0 1px var(--line)}
+.inventory .chart{border-radius:40px 12px 12px 12px}
+.inventory .metric{border-radius:40px 8px;text-align:center}
+.inventory .stages button{border-radius:40px 6px}
+@media(max-width:1110px) {.inventory .main-inventory {grid-template-columns:repeat(2,minmax(0,1fr));grid-template-areas:"s s" "k k" "c i" "r r" "a a"} }
+@media(max-width:700px) {.inventory .desk-inventory {display:block} .inventory .rail {position:static;height:auto;border:0;padding:9px var(--pad)} .inventory .brand,.inventory .rail-link {display:none} .inventory .stages {margin:0;display:flex;flex-wrap:wrap} .inventory .stages button {width:auto} .inventory .main-inventory {grid-template-columns:minmax(0,1fr);grid-template-areas:"s" "k" "c" "r" "i" "a"} .inventory .kpis {grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media print {.inventory .source,.inventory .rail,.inventory .archive,.inventory .statusbar {display:none} .inventory .desk-inventory,.inventory .main-inventory {display:block} .inventory .panel {margin-bottom:8px} }
+
+.receipts{display:flex;gap:8px;flex-wrap:wrap}.receipt{padding:9px 12px;border-radius:0 18px;border:1px solid var(--accent);background:var(--soft)}.arrival{font:700 19px var(--font-num);color:var(--accent)}
+
+.chart-note{margin-top:9px;color:var(--muted);overflow-wrap:anywhere}
